@@ -20,7 +20,7 @@ curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain=$TRAVIS_RUST_VE
 export PATH=$PATH:$HOME/.cargo/bin
 
 rustup component add clippy-preview
-
+rustup component add rustfmt-preview
 
 ### Setup kcov #################################################################
 
