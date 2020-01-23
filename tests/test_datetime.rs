@@ -81,7 +81,11 @@ fn test_datetime_check() {
     let gil = Python::acquire_gil();
     let py = gil.python();
     let (obj, sub_obj, sub_sub_obj) = _get_subclasses(&py, "datetime", "2018, 1, 1, 13, 30, 15")
-        .map_err(|e| e.print(py))
+        .map_err(|e| {
+            e.print_and_set_sys_last_vars(py);
+            py.run("import sys; sys.stderr.flush()", None, None)
+                .unwrap();
+        })
         .unwrap();
 
     assert_check_only!(PyDate_Check, obj);
