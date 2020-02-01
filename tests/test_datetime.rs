@@ -22,13 +22,16 @@ fn _get_subclasses<'p>(
     let make_sub_subclass_py = format!("class {}({}):\n    pass", subsubclass_name, subclass_name);
 
     py.run(&make_subclass_py, None, Some(&locals))?;
+    py.run("print('subclass ok')", None, None)?;
     py.run(&make_sub_subclass_py, None, Some(&locals))?;
+    py.run("print('subsubclass ok')", None, None)?;
 
     // Construct an instance of the base class
     let obj = py.eval(&format!("{}({})", py_type, args), None, Some(&locals))?;
 
     // Construct an instance of the subclass
     let sub_obj = py.eval(&format!("{}({})", subclass_name, args), None, Some(&locals))?;
+    py.run("print('instance subclass ok')", None, None)?;
 
     // Construct an instance of the sub-subclass
     let sub_sub_obj = py.eval(
@@ -36,6 +39,7 @@ fn _get_subclasses<'p>(
         None,
         Some(&locals),
     )?;
+    py.run("print('instance subsubclass ok')", None, None)?;
 
     Ok((obj, sub_obj, sub_sub_obj))
 }
