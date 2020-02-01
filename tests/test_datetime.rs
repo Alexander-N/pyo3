@@ -15,9 +15,11 @@ fn _get_subclasses<'p>(
 
     let locals = [(py_type, datetime.get(py_type)?)].into_py_dict(*py);
 
-    let make_subclass_py = format!("class Subklass({}):\n    pass", py_type);
+    let subclass_name = format!("Subklass{}", py_type);
+    let make_subclass_py = format!("class {}({}):\n    pass", subclass_name, py_type);
 
-    let make_sub_subclass_py = "class SubSubklass(Subklass):\n    pass";
+    let subsubclass_name = format!("SubSubklass{}", py_type);
+    let make_sub_subclass_py = format!("class {}({}):\n    pass", subsubclass_name, subclass_name);
 
     py.run(&make_subclass_py, None, Some(&locals))?;
     py.run(&make_sub_subclass_py, None, Some(&locals))?;
@@ -26,10 +28,14 @@ fn _get_subclasses<'p>(
     let obj = py.eval(&format!("{}({})", py_type, args), None, Some(&locals))?;
 
     // Construct an instance of the subclass
-    let sub_obj = py.eval(&format!("Subklass({})", args), None, Some(&locals))?;
+    let sub_obj = py.eval(&format!("{}({})", subclass_name, args), None, Some(&locals))?;
 
     // Construct an instance of the sub-subclass
-    let sub_sub_obj = py.eval(&format!("SubSubklass({})", args), None, Some(&locals))?;
+    let sub_sub_obj = py.eval(
+        &format!("{}({})", subsubclass_name, args),
+        None,
+        Some(&locals),
+    )?;
 
     Ok((obj, sub_obj, sub_sub_obj))
 }
